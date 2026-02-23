@@ -46,7 +46,7 @@ docker compose version
 
 ```bash
 # Клонируем репозиторий
-git clone https://github.com/TikTakSakh/web_app.git vanilka-bot
+git clone https://github.com/TikTakSakh/vanilka_webapp_ver3.git vanilka-bot
 cd vanilka-bot
 ```
 

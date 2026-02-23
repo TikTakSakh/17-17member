@@ -16,7 +16,7 @@ AI-администратор для магазина бенто-тортов.
 
 ```bash
 # 1. Клонировать репозиторий
-git clone https://github.com/TikTakSakh/web_app.git && cd web_app
+git clone https://github.com/TikTakSakh/vanilka_webapp_ver3.git && cd vanilka_webapp_ver3
 
 # 2. Настроить окружение
 cp .env.example .env
