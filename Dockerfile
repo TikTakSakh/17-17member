@@ -13,7 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY src/ src/
-COPY data/ data/
 
 # Create runtime directories
 RUN mkdir -p logs history data
