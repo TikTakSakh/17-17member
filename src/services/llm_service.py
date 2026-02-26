@@ -43,6 +43,7 @@ class LLMService:
         self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         self._knowledge_base = knowledge_base
         self._model = "gpt-4o-mini"
+        self._custom_system_prompt: str | None = None
 
     def update_knowledge_base(self, knowledge_base: str) -> None:
         """Update the knowledge base content.
@@ -53,11 +54,27 @@ class LLMService:
         self._knowledge_base = knowledge_base
         logger.info("Knowledge base updated, length: %d chars", len(knowledge_base))
 
+    def set_custom_system_prompt(self, prompt: str) -> None:
+        """Set a custom system prompt (admin override)."""
+        self._custom_system_prompt = prompt
+        logger.info("Custom system prompt set, length: %d chars", len(prompt))
+
+    def reset_system_prompt(self) -> None:
+        """Reset to default system prompt."""
+        self._custom_system_prompt = None
+        logger.info("System prompt reset to default")
+
+    def get_current_system_prompt_preview(self) -> str:
+        """Return first 200 chars of the current system prompt for admin preview."""
+        prompt = self._get_system_prompt()
+        return prompt[:200] + ("..." if len(prompt) > 200 else "")
+
     def _get_system_prompt(self) -> str:
         """Get the system prompt with current knowledge base."""
-        return SYSTEM_PROMPT_TEMPLATE.format(
-            knowledge_base=self._knowledge_base or "Информация о баре пока не загружена."
-        )
+        kb = self._knowledge_base or "Информация о баре пока не загружена."
+        if self._custom_system_prompt:
+            return self._custom_system_prompt + f"\n\nИнформация о баре:\n{kb}"
+        return SYSTEM_PROMPT_TEMPLATE.format(knowledge_base=kb)
 
     async def generate_response(
         self,

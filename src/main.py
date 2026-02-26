@@ -131,6 +131,9 @@ async def main() -> None:
     # Reset menu button to default
     await bot.set_chat_menu_button(menu_button=MenuButtonDefault())
 
+    # Clear any previously registered command menu
+    await bot.delete_my_commands()
+
     # Start polling
     logger.info("Bot is starting polling...")
     try:

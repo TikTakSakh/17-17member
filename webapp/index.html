@@ -498,7 +498,7 @@
     <header class="header">
       <div class="header-logo-main">17/17</div>
       <h1>System Terminal</h1>
-      <p>Auth: Guest // Node: 17/17</p>
+      <p>Auth: <span id="authUser">Guest</span> // Node: 17/17</p>
       <button class="room-indicator" id="roomIndicator">
         <span class="dot"></span>
         <span>Вы сейчас тут: <span id="roomLabel">—</span></span>
@@ -552,6 +552,15 @@
     // ── State ─────────────────────────────────────────────────
     let selectedRoom = '';
 
+    // ── Set username from Telegram ───────────────────────────
+    if (tg) {
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        const name = user.first_name || user.username || 'Guest';
+        document.getElementById('authUser').textContent = name;
+      }
+    }
+
     // ── Screen switching ──────────────────────────────────────
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -586,12 +595,7 @@
       setTimeout(() => toast.classList.remove('visible'), duration);
     }
 
-    // ── Config ────────────────────────────────────────────────
-    const BOT_TOKEN = '8795777551:AAE2V2N1VcNGRxLgouxRhcMoKx1gGQIqVGY';
-    const ADMIN_IDS = [771134745];
-    const API_BASE = `https://api.telegram.org/bot${BOT_TOKEN}`;
-
-    // ── Send command via Bot API ──────────────────────────────
+    // ── Send command via Telegram sendData ─────────────────────
     async function sendCommand(commandText, btn) {
       if (!tg) {
         console.log("Command:", commandText, "| Room:", selectedRoom);
@@ -608,56 +612,15 @@
       btn.classList.add('sent');
 
       try {
-        const user = tg.initDataUnsafe?.user;
-        const chatId = user?.id;
+        // Send data to bot backend via Telegram Web App API
+        const payload = JSON.stringify({
+          type: 'command',
+          room: selectedRoom,
+          text: commandText,
+        });
 
-        // Build display name (or fallback)
-        const displayName = user
-          ? user.first_name
-          + (user.last_name ? ' ' + user.last_name : '')
-          + (user.username ? ` (@${user.username})` : '')
-          : 'Гость';
-
-        // 1. Send confirmation to the user (only if we have their chat ID)
-        if (chatId) {
-          const resp = await fetch(`${API_BASE}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: chatId,
-              text: `✅ ${commandText}\n📍 Комната: ${selectedRoom}`,
-            }),
-          });
-          const result = await resp.json();
-          if (!result.ok) {
-            console.warn('User msg failed:', result.description);
-          }
-        }
-
-        // 2. Notify admins (always)
-        const adminText = `🔔 <b>Запрос из Mini App</b>\n\n`
-          + `👤 ${displayName}\n`
-          + `📍 Комната: <b>${selectedRoom}</b>\n`
-          + `📌 <code>${commandText}</code>`;
-
-        for (const adminId of ADMIN_IDS) {
-          const aResp = await fetch(`${API_BASE}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: adminId,
-              text: adminText,
-              parse_mode: 'HTML',
-            }),
-          });
-          const aResult = await aResp.json();
-          if (!aResult.ok) {
-            throw new Error(aResult.description || 'Bot API error');
-          }
-        }
-
+        tg.sendData(payload);
         showToast('> Запрос отправлен');
-
       } catch (err) {
         console.error('Send error:', err);
         showToast('> Ошибка: ' + err.message, 3000);
