@@ -1,4 +1,4 @@
-"""Configuration module for the Vanilka Telegram bot."""
+"""Configuration module for the 17/17 bar Telegram bot."""
 from __future__ import annotations
 
 import os
@@ -24,7 +24,7 @@ class Config:
     max_history_messages: int = 20
     knowledge_base_cache_path: Path = Path("data/knowledge_base.md")
     mini_app_url: str | None = None
-    db_path: Path = Path("data/vanilka.db")
+    db_path: Path = Path("data/bar1717.db")
     admin_user_ids: list[int] | None = None
     whisper_model: str = "small"
 

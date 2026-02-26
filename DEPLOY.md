@@ -1,4 +1,4 @@
-# 🚀 Деплой бота «Ванилька» на сервер
+# 🚀 Деплой бота «17/17» на сервер
 
 Пошаговая инструкция деплоя на Ubuntu VPS через Docker.
 
@@ -46,8 +46,8 @@ docker compose version
 
 ```bash
 # Клонируем репозиторий
-git clone https://github.com/TikTakSakh/vanilka_webapp_ver3.git vanilka-bot
-cd vanilka-bot
+git clone https://github.com/TikTakSakh/17-17member.git bar1717-bot
+cd bar1717-bot
 ```
 
 > Если репозиторий приватный, используйте SSH-ключ или personal access token.
@@ -65,12 +65,12 @@ nano .env
 
 Заполните все значения:
 ```env
-TELEGRAM_BOT_TOKEN=8483024278:AAG...
+TELEGRAM_BOT_TOKEN=8795777551:AAE...
 OPENAI_API_KEY=sk-or-v1-...
 OPENAI_BASE_URL=https://openrouter.ai/api/v1
-GOOGLE_DRIVE_FILE_ID=1eZ7M_wkqiBW8fb2yCFfT3eg9yxWIud8b
+GOOGLE_DRIVE_FILE_ID=1dxXv1J0RUsL_eobpKIYzJQYsyvW_kFDei0iWRV9gN3I
 GOOGLE_SERVICE_ACCOUNT_JSON=./service_account.json
-MINI_APP_URL=https://TikTakSakh.github.io/web_app/
+MINI_APP_URL=https://TikTakSakh.github.io/17-17member/
 ADMIN_USER_IDS=771134745
 WHISPER_MODEL=small
 ```
@@ -81,7 +81,7 @@ WHISPER_MODEL=small
 
 ```bash
 # Со своего компьютера:
-scp service_account.json user@your-server-ip:~/vanilka-bot/
+scp service_account.json user@your-server-ip:~/bar1717-bot/
 ```
 
 ---
@@ -131,7 +131,7 @@ docker compose up -d --build
 ## Шаг 7. Обновление бота
 
 ```bash
-cd ~/vanilka-bot
+cd ~/bar1717-bot
 git pull
 docker compose up -d --build
 ```
@@ -150,7 +150,7 @@ docker compose logs bot
 - Нет доступа к Google Drive файлу
 
 ### Whisper не работает (голосовые)
-- Проверьте, что `ffmpeg` установлен в контейнере: `docker exec vanilka-bot ffmpeg -version`
+- Проверьте, что `ffmpeg` установлен в контейнере: `docker exec bar1717-bot ffmpeg -version`
 - Если мало RAM, смените модель: `WHISPER_MODEL=tiny` в `.env` и пересоберите
 
 ### Место на диске

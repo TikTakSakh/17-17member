@@ -60,9 +60,9 @@ def setup_services(
     _bot_start_time = datetime.now()
 
 
-WELCOME_MESSAGE = """Привет! 👋 Я администратор магазина "Ванилька". 
+WELCOME_MESSAGE = """Привет! 👋 Добро пожаловать в бар «17/17»!
 
-🎂 Я помогу вам с информацией о наших бенто-тортах, ценах, доставке и многом другом!
+🍸 Я помогу вам сориентироваться в нашем меню, ценах и услугах.
 
 Просто напишите мне ваш вопрос или отправьте голосовое сообщение."""
 
@@ -85,7 +85,7 @@ async def command_start_handler(message: Message) -> None:
             keyboard=[
                 [
                     KeyboardButton(
-                        text="🍰 Сделать заказ",
+                        text="📟 Терминал",
                         web_app=WebAppInfo(url=mini_app_url),
                     ),
                     KeyboardButton(text="📞 Поддержка"),
@@ -114,11 +114,10 @@ SUPPORT_MESSAGE = """📞 <b>Поддержка</b>
 
 Свяжитесь с нами любым удобным способом:
 
-📱 Телефон: +7 (343) 123-45-67
-💬 WhatsApp / Telegram: +7 (912) 345-67-89
-📧 Email: info@vanilka-cakes.ru
+📱 Свяжитесь с администратором бара «17/17»
+💬 Telegram: напишите нам
 
-⏰ <i>Пн–Пт: 10:00–20:00 · Сб: 11:00–19:00</i>"""
+⏰ <i>Уточняйте график работы у администратора</i>"""
 
 
 @router.message(F.text == "📞 Поддержка")
@@ -372,6 +371,18 @@ async def web_app_data_handler(message: Message) -> None:
                     "\n".join(history_lines),
                     message.from_user.username,
                 )
+
+        elif data.get("type") == "command":
+            command_text = data.get("text", "")
+            if command_text:
+                await message.answer(command_text)
+
+                if history_logger and message.from_user:
+                    history_logger.log_message(
+                        message.from_user.id,
+                        f"Команда: {command_text}",
+                        message.from_user.username,
+                    )
 
     except json.JSONDecodeError:
         await message.answer("Ошибка при обработке заказа. Попробуйте ещё раз.")

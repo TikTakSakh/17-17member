@@ -1,4 +1,4 @@
-"""Main entry point for the Vanilka Telegram bot."""
+"""Main entry point for the 17/17 bar Telegram bot."""
 from __future__ import annotations
 
 import asyncio
@@ -38,7 +38,7 @@ def _setup_logging() -> None:
     log_dir = Path("logs")
     log_dir.mkdir(parents=True, exist_ok=True)
     file_handler = RotatingFileHandler(
-        log_dir / "vanilka.log",
+        log_dir / "bar1717.log",
         maxBytes=5 * 1024 * 1024,  # 5 MB
         backupCount=3,
         encoding="utf-8",
@@ -53,7 +53,7 @@ logger = logging.getLogger(__name__)
 async def main() -> None:
     """Initialize and run the bot."""
     _setup_logging()
-    logger.info("Starting Vanilka bot...")
+    logger.info("Starting 17/17 bar bot...")
 
     # Load configuration
     try:

@@ -1,7 +1,7 @@
 services:
   bot:
     build: .
-    container_name: vanilka-bot
+    container_name: bar1717-bot
     restart: unless-stopped
     env_file:
       - .env
