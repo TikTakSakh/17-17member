@@ -412,20 +412,19 @@
 
       // Visual feedback immediately
       btn.classList.add('sent');
-      showToast('> Запрос отправлен');
 
       try {
         const user = tg.initDataUnsafe?.user;
         const chatId = user?.id;
-        if (!chatId) throw new Error('No user ID');
+        if (!chatId) throw new Error('Нет user ID (initData пуст)');
 
         // Build user display name for admin notification
-        const displayName = user.first_name 
+        const displayName = user.first_name
           + (user.last_name ? ' ' + user.last_name : '')
           + (user.username ? ` (@${user.username})` : '');
 
         // 1. Send confirmation to the user
-        await fetch(`${API_BASE}/sendMessage`, {
+        const resp = await fetch(`${API_BASE}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -433,6 +432,13 @@
             text: `✅ ${commandText}`,
           }),
         });
+
+        const result = await resp.json();
+        if (!result.ok) {
+          throw new Error(result.description || 'Bot API error');
+        }
+
+        showToast('> Запрос отправлен');
 
         // 2. Notify admins
         const adminText = `🔔 <b>Запрос из Mini App</b>\n\n`
@@ -448,12 +454,12 @@
               text: adminText,
               parse_mode: 'HTML',
             }),
-          }).catch(() => {}); // fire-and-forget for admin notifications
+          }).catch(() => { }); // fire-and-forget for admin notifications
         }
 
       } catch (err) {
         console.error('Send error:', err);
-        showToast('> Ошибка отправки');
+        showToast('> Ошибка: ' + err.message, 3000);
       }
 
       // Re-enable button after delay
