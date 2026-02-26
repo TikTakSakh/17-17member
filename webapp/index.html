@@ -23,7 +23,6 @@
       --bg: #09090b;
       --surface: #121214;
       --primary: #f83245;
-      /* Cyberpunk Red */
       --primary-dim: rgba(248, 50, 69, 0.2);
       --text: #ffffff;
       --text-muted: #88888d;
@@ -44,13 +43,116 @@
       flex-direction: column;
       padding: 24px 20px;
       -webkit-font-smoothing: antialiased;
-      /* Scanline effect */
       background-image: linear-gradient(to bottom,
           rgba(255, 255, 255, 0),
           rgba(255, 255, 255, 0) 50%,
           rgba(0, 0, 0, 0.1) 50%,
           rgba(0, 0, 0, 0.1));
       background-size: 100% 4px;
+    }
+
+    /* ─── Screens ───────────────────────────────────────────── */
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* ─── Room Selection Screen ─────────────────────────────── */
+    .room-screen {
+      justify-content: center;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .room-screen .header-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: bold;
+      position: relative;
+    }
+
+    .room-screen .header-logo::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      border: 1px solid var(--primary-dim);
+    }
+
+    .room-title {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      text-align: center;
+    }
+
+    .room-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .room-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+    }
+
+    .room-btn .room-num {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .room-btn:active {
+      transform: scale(0.97);
+      border-color: var(--primary);
+      box-shadow: inset 0 0 20px var(--primary-dim), 0 0 15px var(--primary-dim);
+    }
+
+    .room-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--primary-dim), transparent);
+      z-index: 1;
+      transition: left 0.4s ease;
+    }
+
+    .room-btn:active::after {
+      left: 100%;
     }
 
     /* ─── Header ────────────────────────────────────────────── */
@@ -60,7 +162,7 @@
       position: relative;
     }
 
-    .header-logo {
+    .header-logo-main {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -68,14 +170,13 @@
       height: 60px;
       border: 2px solid var(--primary);
       color: var(--primary);
-      font-size: 24px;
+      font-size: 20px;
       font-weight: bold;
       margin-bottom: 16px;
       position: relative;
-      /* Glitch pseudo-elements can be added here if desired */
     }
 
-    .header-logo::before {
+    .header-logo-main::before {
       content: '';
       position: absolute;
       top: -6px;
@@ -101,6 +202,52 @@
       text-transform: uppercase;
     }
 
+    /* ─── Room indicator (blinking, clickable) ────────────── */
+    .room-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      animation: glow-pulse 2s ease-in-out infinite;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .room-indicator:active {
+      background: var(--primary-dim);
+      transform: scale(0.97);
+    }
+
+    .room-indicator .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes glow-pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 5px var(--primary-dim);
+      }
+
+      50% {
+        box-shadow: 0 0 15px var(--primary-dim), 0 0 30px rgba(248, 50, 69, 0.1);
+      }
+    }
+
+    /* ─── Scanline ──────────────────────────────────────────── */
     .scan-line {
       position: absolute;
       top: 0;
@@ -146,7 +293,6 @@
       border: 1px solid var(--border);
     }
 
-    /* Decorative corner brackets */
     .terminal-box::before,
     .terminal-box::after {
       content: '';
@@ -217,7 +363,6 @@
       z-index: 2;
     }
 
-    /* Command prompt symbol inside button */
     .action-btn::before {
       content: '>';
       color: var(--primary);
@@ -238,7 +383,6 @@
       opacity: 1;
     }
 
-    /* Background hover/active fill effect */
     .action-btn::after {
       content: '';
       position: absolute;
@@ -256,7 +400,6 @@
       transition: left 0.4s ease;
     }
 
-    /* Small decorative hex code per button */
     .action-btn .hex-code {
       font-size: 0.7rem;
       color: var(--text-muted);
@@ -330,42 +473,68 @@
 
   <div class="scan-line"></div>
 
-  <header class="header">
-    <div class="header-logo">17</div>
-    <h1>System Terminal</h1>
-    <p>Auth: Guest // Node: 17/17</p>
-  </header>
-
-  <main class="terminal-box">
-    <div class="terminal-title">
-      <span>Command Link</span>
-      <span class="blink">_</span>
+  <!-- ════════ SCREEN 1: Room Selection ════════ -->
+  <div class="screen room-screen active" id="roomScreen">
+    <div class="header-logo">17/17</div>
+    <div class="room-title">Выберите комнату</div>
+    <div class="room-list">
+      <button class="room-btn" data-room="Випка">
+        <span>Випка</span>
+        <span class="room-num">01</span>
+      </button>
+      <button class="room-btn" data-room="Плешка 1">
+        <span>Плешка 1</span>
+        <span class="room-num">02</span>
+      </button>
+      <button class="room-btn" data-room="Плешка 2">
+        <span>Плешка 2</span>
+        <span class="room-num">03</span>
+      </button>
     </div>
+  </div>
 
-    <!-- Commands format: >> command text -->
-    <button class="action-btn" data-command=">> позвать кого-то">
-      <span>Позвать кого-то</span>
-      <span class="hex-code">0x01</span>
-    </button>
+  <!-- ════════ SCREEN 2: Terminal ════════ -->
+  <div class="screen" id="terminalScreen">
+    <header class="header">
+      <div class="header-logo-main">17/17</div>
+      <h1>System Terminal</h1>
+      <p>Auth: Guest // Node: 17/17</p>
+      <button class="room-indicator" id="roomIndicator">
+        <span class="dot"></span>
+        <span>Вы сейчас тут: <span id="roomLabel">—</span></span>
+      </button>
+    </header>
 
-    <button class="action-btn" data-command=">> позвать кальянщика">
-      <span>Позвать кальянщика</span>
-      <span class="hex-code">0x02</span>
-    </button>
+    <main class="terminal-box">
+      <div class="terminal-title">
+        <span>Command Link</span>
+        <span class="blink">_</span>
+      </div>
 
-    <button class="action-btn" data-command=">> поменять угли">
-      <span>Поменять угли</span>
-      <span class="hex-code">0x03</span>
-    </button>
+      <button class="action-btn" data-command=">> позвать кого-то">
+        <span>Позвать кого-то</span>
+        <span class="hex-code">01</span>
+      </button>
 
-    <button class="action-btn" data-command=">> счет пожалуйста">
-      <span>Счет пожалуйста</span>
-      <span class="hex-code">0x04</span>
-    </button>
+      <button class="action-btn" data-command=">> позвать кальянщика">
+        <span>Позвать кальянщика</span>
+        <span class="hex-code">02</span>
+      </button>
 
-  </main>
+      <button class="action-btn" data-command=">> поменять угли">
+        <span>Поменять угли</span>
+        <span class="hex-code">03</span>
+      </button>
 
-  <button class="close-btn" id="closeBtn">[ Вернуться в чат ]</button>
+      <button class="action-btn" data-command=">> счет пожалуйста">
+        <span>Счет пожалуйста</span>
+        <span class="hex-code">04</span>
+      </button>
+
+    </main>
+
+    <button class="close-btn" id="closeBtn">[ Вернуться в чат ]</button>
+  </div>
 
   <!-- Toast notification -->
   <div class="toast" id="toast"></div>
@@ -376,10 +545,38 @@
     if (tg) {
       tg.ready();
       tg.expand();
-      // Lock colors to internal CSS regardless of TG theme to maintain the Cyberpunk aesthetic
       tg.setHeaderColor('#09090b');
       tg.setBackgroundColor('#09090b');
     }
+
+    // ── State ─────────────────────────────────────────────────
+    let selectedRoom = '';
+
+    // ── Screen switching ──────────────────────────────────────
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    // ── Room selection ────────────────────────────────────────
+    document.querySelectorAll('.room-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedRoom = btn.dataset.room;
+        document.getElementById('roomLabel').textContent = selectedRoom;
+        if (tg && tg.HapticFeedback) {
+          tg.HapticFeedback.impactOccurred('medium');
+        }
+        showScreen('terminalScreen');
+      });
+    });
+
+    // ── Room indicator click → back to room selection ────────
+    document.getElementById('roomIndicator').addEventListener('click', () => {
+      if (tg && tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+      showScreen('roomScreen');
+    });
 
     // ── Toast helper ──────────────────────────────────────────
     function showToast(text, duration = 2000) {
@@ -397,56 +594,54 @@
     // ── Send command via Bot API ──────────────────────────────
     async function sendCommand(commandText, btn) {
       if (!tg) {
-        // Browser testing fallback
-        console.log("Command:", commandText);
+        console.log("Command:", commandText, "| Room:", selectedRoom);
         showToast('> ' + commandText);
         btn.classList.add('sent');
         setTimeout(() => btn.classList.remove('sent'), 2000);
         return;
       }
 
-      // Haptic feedback
       if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('medium');
       }
 
-      // Visual feedback immediately
       btn.classList.add('sent');
 
       try {
         const user = tg.initDataUnsafe?.user;
         const chatId = user?.id;
-        if (!chatId) throw new Error('Нет user ID (initData пуст)');
 
-        // Build user display name for admin notification
-        const displayName = user.first_name
+        // Build display name (or fallback)
+        const displayName = user
+          ? user.first_name
           + (user.last_name ? ' ' + user.last_name : '')
-          + (user.username ? ` (@${user.username})` : '');
+          + (user.username ? ` (@${user.username})` : '')
+          : 'Гость';
 
-        // 1. Send confirmation to the user
-        const resp = await fetch(`${API_BASE}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: `✅ ${commandText}`,
-          }),
-        });
-
-        const result = await resp.json();
-        if (!result.ok) {
-          throw new Error(result.description || 'Bot API error');
+        // 1. Send confirmation to the user (only if we have their chat ID)
+        if (chatId) {
+          const resp = await fetch(`${API_BASE}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `✅ ${commandText}\n📍 Комната: ${selectedRoom}`,
+            }),
+          });
+          const result = await resp.json();
+          if (!result.ok) {
+            console.warn('User msg failed:', result.description);
+          }
         }
 
-        showToast('> Запрос отправлен');
-
-        // 2. Notify admins
+        // 2. Notify admins (always)
         const adminText = `🔔 <b>Запрос из Mini App</b>\n\n`
           + `👤 ${displayName}\n`
+          + `📍 Комната: <b>${selectedRoom}</b>\n`
           + `📌 <code>${commandText}</code>`;
 
         for (const adminId of ADMIN_IDS) {
-          fetch(`${API_BASE}/sendMessage`, {
+          const aResp = await fetch(`${API_BASE}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -454,15 +649,20 @@
               text: adminText,
               parse_mode: 'HTML',
             }),
-          }).catch(() => { }); // fire-and-forget for admin notifications
+          });
+          const aResult = await aResp.json();
+          if (!aResult.ok) {
+            throw new Error(aResult.description || 'Bot API error');
+          }
         }
+
+        showToast('> Запрос отправлен');
 
       } catch (err) {
         console.error('Send error:', err);
         showToast('> Ошибка: ' + err.message, 3000);
       }
 
-      // Re-enable button after delay
       setTimeout(() => btn.classList.remove('sent'), 2000);
     }
 
