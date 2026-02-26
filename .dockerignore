@@ -17,7 +17,7 @@ prd.md
 # Runtime data (mounted as volumes)
 logs/
 history/
-data/vanilka.db
+data/*.db
 service_account.json
 
 # OS
