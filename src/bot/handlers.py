@@ -8,6 +8,8 @@ from datetime import datetime
 
 from aiogram import Bot, F, Router
 from aiogram.filters import Command, CommandStart
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import (
     BufferedInputFile,
     KeyboardButton,
@@ -97,7 +99,7 @@ async def command_start_handler(message: Message, bot: Bot) -> None:
                         text="🚨 Кнопка вызова",
                         web_app=WebAppInfo(url=mini_app_url),
                     ),
-                    KeyboardButton(text="📞 Поддержка"),
+                    KeyboardButton(text="📝 Обратная связь"),
                 ]
             ],
             resize_keyboard=True,
@@ -118,22 +120,56 @@ async def command_start_handler(message: Message, bot: Bot) -> None:
         )
 
 
-# ── Поддержка ────────────────────────────────────────────────
+# ── Обратная связь ───────────────────────────────────────────
 
-SUPPORT_MESSAGE = """📞 <b>Поддержка</b>
+class FeedbackState(StatesGroup):
+    waiting_for_feedback = State()
 
-Свяжитесь с нами любым удобным способом:
+@router.message(F.text == "📝 Обратная связь")
+async def feedback_start_handler(message: Message, state: FSMContext) -> None:
+    """Handle Обратная связь button press."""
+    await message.answer(
+        "📝 <b>Обратная связь</b>\n\n"
+        "Пожалуйста, напишите ваше сообщение, пожелание или вопрос ниже, "
+        "и бот перешлёт его администратору."
+    )
+    await state.set_state(FeedbackState.waiting_for_feedback)
 
-📱 Свяжитесь с администратором бара «17/17»
-💬 Telegram: напишите нам
+@router.message(FeedbackState.waiting_for_feedback)
+async def feedback_process_handler(message: Message, state: FSMContext, bot: Bot) -> None:
+    """Process the feedback message and forward it to admins."""
+    await state.clear()
+    
+    if not message.text or not message.from_user:
+        await message.answer("⚠️ Пожалуйста, отправьте текстовое сообщение для обратной связи.")
+        return
 
-⏰ <i>Уточняйте график работы у администратора</i>"""
+    # Confirm to user
+    await message.answer("✅ Спасибо! Ваше сообщение успешно передано администратору.")
 
+    # Forward to admins
+    if dialog_history:
+        admin_ids = await dialog_history.get_notification_admin_ids()
+        
+        # Build display name
+        user = message.from_user
+        display_name = user.first_name
+        if user.last_name:
+            display_name += f" {user.last_name}"
+        if user.username:
+            display_name += f" (@{user.username})"
+            
+        forward_text = (
+            f"📩 <b>Новая обратная связь:</b>\n"
+            f"👤 От: {display_name} (ID: <code>{user.id}</code>)\n\n"
+            f"<i>{message.text}</i>"
+        )
 
-@router.message(F.text == "📞 Поддержка")
-async def support_handler(message: Message) -> None:
-    """Handle Поддержка button press."""
-    await message.answer(SUPPORT_MESSAGE)
+        for admin_id in admin_ids:
+            try:
+                await bot.send_message(admin_id, forward_text, parse_mode="HTML")
+            except Exception as e:
+                logger.error("Failed to forward feedback to %s: %s", admin_id, e)
 
 
 # ── /help ────────────────────────────────────────────────────

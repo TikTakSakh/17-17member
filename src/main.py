@@ -134,12 +134,94 @@ async def main() -> None:
     # Clear any previously registered command menu
     await bot.delete_my_commands()
 
+    # Define aiohttp web app for Mini App notifications
+    from aiohttp import web
+
+    async def handle_notify(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+            room = data.get("room", "Неизвестная комната")
+            command = data.get("command", "")
+            user_data = data.get("user", {})
+            user_id = user_data.get("id")
+            user_name = user_data.get("name", "Гость")
+            
+            clean_command = command.lstrip("> ").strip()
+            
+            # 1. Send confirmation to the user
+            if user_id:
+                try:
+                    await bot.send_message(
+                        user_id,
+                        f"✅ Запрос отправлен!\n� Комната: <b>{room}</b>\n📌 {clean_command}",
+                        parse_mode=ParseMode.HTML
+                    )
+                except Exception as e:
+                    logger.warning("Could not send confirmation to user %s: %s", user_id, e)
+                    
+                # Log to history
+                if history_logger:
+                    history_logger.log_message(
+                        user_id,
+                        f"{room} просит {clean_command}",
+                        user_name
+                    )
+            
+            # 2. Notify all admins
+            notification_text = f"🔔 <b>{room}</b> просит <b>{clean_command}</b>"
+            admin_ids = await dialog_history.get_notification_admin_ids()
+            
+            success_count = 0
+            for admin_id in admin_ids:
+                try:
+                    await bot.send_message(admin_id, notification_text, parse_mode=ParseMode.HTML)
+                    success_count += 1
+                except Exception as e:
+                    logger.error("Failed to notify admin %s: %s", admin_id, e)
+                    
+            return web.json_response({
+                "ok": True, 
+                "notified": success_count,
+                "total_admins": len(admin_ids)
+            })
+            
+        except Exception as e:
+            logger.error("Error in /notify: %s", e)
+            return web.json_response({"ok": False, "error": str(e)}, status=400)
+
+    app = web.Application()
+    
+    # Configure CORS for the API
+    import aiohttp_cors
+    cors = aiohttp_cors.setup(app, defaults={
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+            allow_methods="*",
+        )
+    })
+    
+    resource = cors.add(app.router.add_resource("/notify"))
+    cors.add(resource.add_route("POST", handle_notify))
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    
+    # Run API server on port 8080 (or configurable if needed)
+    port = 8080
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    
+    logger.info("Starting API server on port %s...", port)
+    await site.start()
+
     # Start polling
     logger.info("Bot is starting polling...")
     try:
         await dp.start_polling(bot)
     finally:
         logger.info("Shutting down...")
+        await runner.cleanup()
         await dialog_history.close()
         await bot.session.close()
         logger.info("Bot stopped")
@@ -147,3 +229,4 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+

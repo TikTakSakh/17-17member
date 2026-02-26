@@ -605,7 +605,11 @@
       setTimeout(() => toast.classList.remove('visible'), duration);
     }
 
-    // ── Send command via Telegram sendData ─────────────────────
+    // ── Config ────────────────────────────────────────────────
+    // WARNING: For production, change to your secure HTTPS backend URL (e.g. ngrok or real domain)
+    const BACKEND_API_URL = 'http://localhost:8080/notify';
+
+    // ── Send command via Custom Backend ───────────────────────
     async function sendCommand(commandText, btn) {
       if (!tg) {
         console.log("Command:", commandText, "| Room:", selectedRoom);
@@ -622,18 +626,46 @@
       btn.classList.add('sent');
 
       try {
-        // Send data to bot backend via Telegram Web App API
-        const payload = JSON.stringify({
-          type: 'command',
+        const user = tg.initDataUnsafe?.user;
+        const chatId = user?.id;
+
+        // Build display name (or fallback)
+        const displayName = user
+          ? user.first_name
+          + (user.last_name ? ' ' + user.last_name : '')
+          + (user.username ? ` (@${user.username})` : '')
+          : 'Гость';
+
+        const cleanCommand = commandText.replace(/^>>\s*/, '');
+
+        // Build payload
+        const payload = {
           room: selectedRoom,
-          text: commandText,
+          command: commandText,
+          user: {
+            id: chatId,
+            name: displayName
+          }
+        };
+
+        // Notify backend (which will notify admins via /setadmin)
+        const resp = await fetch(BACKEND_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         });
 
-        tg.sendData(payload);
-        showToast('> Запрос отправлен');
+        // 1. Show confirmation toast in Mini App
+        if (resp.ok) {
+          showToast('> Запрос отправлен');
+        } else {
+          console.warn('Backend returned error status');
+          showToast('> Ошибка отправки', 3000);
+        }
+
       } catch (err) {
         console.error('Send error:', err);
-        showToast('> Ошибка: ' + err.message, 3000);
+        showToast('> Ошибка связи с сервером', 3000);
       }
 
       setTimeout(() => btn.classList.remove('sent'), 2000);
