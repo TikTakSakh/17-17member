@@ -24,7 +24,7 @@ class Config:
     max_history_messages: int = 20
     knowledge_base_cache_path: Path = Path("data/knowledge_base.md")
     mini_app_url: str | None = None
-    db_path: Path = Path("data/bar1717.db")
+    db_path: Path = Path("data/1717.db")
     admin_user_ids: list[int] | None = None
     whisper_model: str = "small"
 
@@ -68,7 +68,7 @@ def load_config() -> Config:
             os.getenv("KNOWLEDGE_BASE_CACHE_PATH", "data/knowledge_base.md")
         ),
         mini_app_url=os.getenv("MINI_APP_URL") or None,
-        db_path=Path(os.getenv("DB_PATH", "data/vanilka.db")),
+        db_path=Path(os.getenv("DB_PATH", "data/1717.db")),
         admin_user_ids=_parse_admin_ids(os.getenv("ADMIN_USER_IDS")),
         whisper_model=os.getenv("WHISPER_MODEL", "small"),
     )

@@ -9,6 +9,7 @@ from aiogram import Bot, F, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import (
     KeyboardButton,
+    MenuButtonDefault,
     Message,
     ReplyKeyboardMarkup,
     WebAppInfo,
@@ -77,15 +78,21 @@ def _is_admin(user_id: int) -> bool:
 # ── /start ───────────────────────────────────────────────────
 
 @router.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
+async def command_start_handler(message: Message, bot: Bot) -> None:
     """Handle /start command with welcome message and catalog button."""
+    # Force reset menu button for this specific chat (clears cached MenuButtonWebApp)
+    await bot.set_chat_menu_button(
+        chat_id=message.chat.id,
+        menu_button=MenuButtonDefault()
+    )
+
     # Build reply keyboard with web app button
     if mini_app_url:
         keyboard = ReplyKeyboardMarkup(
             keyboard=[
                 [
                     KeyboardButton(
-                        text="📟 Терминал",
+                        text="🚨 Кнопка вызова",
                         web_app=WebAppInfo(url=mini_app_url),
                     ),
                     KeyboardButton(text="📞 Поддержка"),
@@ -375,7 +382,7 @@ async def web_app_data_handler(message: Message) -> None:
         elif data.get("type") == "command":
             command_text = data.get("text", "")
             if command_text:
-                await message.answer(command_text)
+                logger.info("WebApp command from user %s: %s", message.from_user.id if message.from_user else "?", command_text)
 
                 if history_logger and message.from_user:
                     history_logger.log_message(

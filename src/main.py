@@ -10,7 +10,7 @@ from pathlib import Path
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.types import MenuButtonDefault
+from aiogram.types import MenuButtonDefault, MenuButtonWebApp, WebAppInfo
 
 from src.bot.handlers import router, setup_services
 from src.bot.middlewares import ErrorHandlingMiddleware, LoggingMiddleware
@@ -128,7 +128,7 @@ async def main() -> None:
     dp.include_router(router)
 
 
-    # Reset menu button to default (remove old MenuButtonWebApp)
+    # Reset menu button to default
     await bot.set_chat_menu_button(menu_button=MenuButtonDefault())
 
     # Start polling

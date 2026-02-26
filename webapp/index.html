@@ -22,7 +22,8 @@
     :root {
       --bg: #09090b;
       --surface: #121214;
-      --primary: #f83245; /* Cyberpunk Red */
+      --primary: #f83245;
+      /* Cyberpunk Red */
       --primary-dim: rgba(248, 50, 69, 0.2);
       --text: #ffffff;
       --text-muted: #88888d;
@@ -44,13 +45,11 @@
       padding: 24px 20px;
       -webkit-font-smoothing: antialiased;
       /* Scanline effect */
-      background-image: linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0),
-        rgba(255, 255, 255, 0) 50%,
-        rgba(0, 0, 0, 0.1) 50%,
-        rgba(0, 0, 0, 0.1)
-      );
+      background-image: linear-gradient(to bottom,
+          rgba(255, 255, 255, 0),
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.1) 50%,
+          rgba(0, 0, 0, 0.1));
       background-size: 100% 4px;
     }
 
@@ -91,7 +90,7 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--text);
-      text-shadow: 0 0 10px rgba(255,255,255,0.3);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
     .header p {
@@ -116,10 +115,23 @@
     }
 
     @keyframes scan {
-      0% { top: -20px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: 120%; opacity: 0; }
+      0% {
+        top: -20px;
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        top: 120%;
+        opacity: 0;
+      }
     }
 
     /* ─── Action Terminal ───────────────────────────────────── */
@@ -143,15 +155,17 @@
       height: 15px;
       pointer-events: none;
     }
-    
+
     .terminal-box::before {
-      top: -1px; left: -1px;
+      top: -1px;
+      left: -1px;
       border-top: 2px solid var(--primary);
       border-left: 2px solid var(--primary);
     }
-    
+
     .terminal-box::after {
-      bottom: -1px; right: -1px;
+      bottom: -1px;
+      right: -1px;
       border-bottom: 2px solid var(--primary);
       border-right: 2px solid var(--primary);
     }
@@ -171,7 +185,11 @@
       color: var(--primary);
     }
 
-    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
 
     /* ─── Buttons ───────────────────────────────────────────── */
     .action-btn {
@@ -214,7 +232,7 @@
       border-color: var(--primary);
       box-shadow: inset 0 0 15px var(--primary-dim);
     }
-    
+
     .action-btn:active::before {
       margin-right: 12px;
       opacity: 1;
@@ -224,7 +242,10 @@
     .action-btn::after {
       content: '';
       position: absolute;
-      top: 0; left: -100%; width: 100%; height: 100%;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
       background: linear-gradient(90deg, transparent, var(--primary-dim), transparent);
       z-index: 1;
       transition: left 0.4s ease;
@@ -241,11 +262,72 @@
       color: var(--text-muted);
     }
 
+    /* ─── Button sent state ────────────────────────────────── */
+    .action-btn.sent {
+      border-color: var(--primary);
+      pointer-events: none;
+    }
+
+    .action-btn.sent span:first-child::after {
+      content: ' ✓';
+      color: var(--primary);
+    }
+
+    /* ─── Toast notification ───────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 12px 24px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 0 20px var(--primary-dim);
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── Close button ─────────────────────────────────────── */
+    .close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 20px;
+      margin-top: 16px;
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .close-btn:active {
+      background: var(--primary-dim);
+      transform: scale(0.98);
+    }
   </style>
 </head>
 
 <body>
-  
+
   <div class="scan-line"></div>
 
   <header class="header">
@@ -265,17 +347,17 @@
       <span>Позвать кого-то</span>
       <span class="hex-code">0x01</span>
     </button>
-    
+
     <button class="action-btn" data-command=">> позвать кальянщика">
       <span>Позвать кальянщика</span>
       <span class="hex-code">0x02</span>
     </button>
-    
+
     <button class="action-btn" data-command=">> поменять угли">
       <span>Поменять угли</span>
       <span class="hex-code">0x03</span>
     </button>
-    
+
     <button class="action-btn" data-command=">> счет пожалуйста">
       <span>Счет пожалуйста</span>
       <span class="hex-code">0x04</span>
@@ -283,9 +365,14 @@
 
   </main>
 
+  <button class="close-btn" id="closeBtn">[ Вернуться в чат ]</button>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
   <script>
     const tg = window.Telegram?.WebApp;
-    
+
     if (tg) {
       tg.ready();
       tg.expand();
@@ -294,35 +381,100 @@
       tg.setBackgroundColor('#09090b');
     }
 
-    // Assign click listeners to all action buttons
-    document.querySelectorAll('.action-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const commandText = btn.dataset.command;
-        
-        // Brief haptic feedback
-        if (tg && tg.HapticFeedback) {
-          tg.HapticFeedback.impactOccurred('medium');
-        }
+    // ── Toast helper ──────────────────────────────────────────
+    function showToast(text, duration = 2000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = text;
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), duration);
+    }
 
-        const payload = JSON.stringify({
-          type: "command",
-          text: commandText
+    // ── Config ────────────────────────────────────────────────
+    const BOT_TOKEN = '8795777551:AAE2V2N1VcNGRxLgouxRhcMoKx1gGQIqVGY';
+    const ADMIN_IDS = [771134745];
+    const API_BASE = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
+    // ── Send command via Bot API ──────────────────────────────
+    async function sendCommand(commandText, btn) {
+      if (!tg) {
+        // Browser testing fallback
+        console.log("Command:", commandText);
+        showToast('> ' + commandText);
+        btn.classList.add('sent');
+        setTimeout(() => btn.classList.remove('sent'), 2000);
+        return;
+      }
+
+      // Haptic feedback
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('medium');
+      }
+
+      // Visual feedback immediately
+      btn.classList.add('sent');
+      showToast('> Запрос отправлен');
+
+      try {
+        const user = tg.initDataUnsafe?.user;
+        const chatId = user?.id;
+        if (!chatId) throw new Error('No user ID');
+
+        // Build user display name for admin notification
+        const displayName = user.first_name 
+          + (user.last_name ? ' ' + user.last_name : '')
+          + (user.username ? ` (@${user.username})` : '');
+
+        // 1. Send confirmation to the user
+        await fetch(`${API_BASE}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: `✅ ${commandText}`,
+          }),
         });
 
-        if (tg) {
-          try {
-            tg.sendData(payload);
-          } catch (err) {
-            alert("Команда отправлена.");
-            console.error(err);
-            tg.close();
-          }
-        } else {
-          // Fallback for browser testing
-          console.log("Sending payload:", payload);
-          alert("Отправлено:\n" + payload);
+        // 2. Notify admins
+        const adminText = `🔔 <b>Запрос из Mini App</b>\n\n`
+          + `👤 ${displayName}\n`
+          + `📌 <code>${commandText}</code>`;
+
+        for (const adminId of ADMIN_IDS) {
+          fetch(`${API_BASE}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: adminId,
+              text: adminText,
+              parse_mode: 'HTML',
+            }),
+          }).catch(() => {}); // fire-and-forget for admin notifications
         }
-      });
+
+      } catch (err) {
+        console.error('Send error:', err);
+        showToast('> Ошибка отправки');
+      }
+
+      // Re-enable button after delay
+      setTimeout(() => btn.classList.remove('sent'), 2000);
+    }
+
+    // ── Button listeners ──────────────────────────────────────
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', () => sendCommand(btn.dataset.command, btn));
+    });
+
+    // ── Close button ──────────────────────────────────────────
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      if (tg && tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+      if (tg) {
+        tg.close();
+      } else {
+        showToast('> Закрытие...');
+      }
     });
   </script>
 </body>
