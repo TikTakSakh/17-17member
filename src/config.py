@@ -41,19 +41,19 @@ def load_config() -> Config:
     """
     load_dotenv()
     
-    telegram_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    telegram_token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     if not telegram_token:
         raise ValueError("TELEGRAM_BOT_TOKEN environment variable is required")
     
-    openai_key = os.getenv("OPENAI_API_KEY")
+    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not openai_key:
         raise ValueError("OPENAI_API_KEY environment variable is required")
     
-    drive_file_id = os.getenv("GOOGLE_DRIVE_FILE_ID")
+    drive_file_id = os.getenv("GOOGLE_DRIVE_FILE_ID", "").strip()
     if not drive_file_id:
         raise ValueError("GOOGLE_DRIVE_FILE_ID environment variable is required")
     
-    service_account_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    service_account_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
     if not service_account_json:
         raise ValueError("GOOGLE_SERVICE_ACCOUNT_JSON environment variable is required")
     
