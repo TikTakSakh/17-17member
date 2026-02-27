@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    ports:
+      - "8080:8080"
     volumes:
       - ./service_account.json:/app/service_account.json:ro
       - bot-data:/app/data
