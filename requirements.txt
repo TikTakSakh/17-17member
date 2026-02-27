@@ -5,6 +5,7 @@ google-auth-httplib2
 google-auth-oauthlib
 python-dotenv
 aiohttp
+aiohttp_cors
 beartype
 python-docx
 aiosqlite
